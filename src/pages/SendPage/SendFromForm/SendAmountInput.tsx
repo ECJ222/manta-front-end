@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import { useTxStatus } from 'contexts/txStatusContext';
@@ -27,10 +27,18 @@ const SendAmountInput = () => {
   const [inputValue, setInputValue] = useState('');
 
   const shouldShowLoader = !senderAssetCurrentBalance && api?.isConnected;
-  const shouldShowInitialSync = shouldShowLoader && isInitialSync.current && senderIsPrivate();
+  const shouldShowInitialSync =
+    shouldShowLoader && isInitialSync.current && senderIsPrivate();
   const balanceText = shouldShowInitialSync
-    ? 'Syncing to network' : senderAssetCurrentBalance?.toString(true);
+    ? 'Syncing to network'
+    : senderAssetCurrentBalance?.toString(true);
   const disabled = txStatus?.isProcessing();
+
+  useEffect(() => {
+    if (!shouldShowLoader) {
+      onChangeSendAmountInput('');
+    }
+  }, [balanceText]);
 
   const onChangeSendAmountInput = (value) => {
     if (value === '') {
